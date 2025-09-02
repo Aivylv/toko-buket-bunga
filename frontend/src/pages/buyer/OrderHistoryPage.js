@@ -1,34 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import './OrderHistoryPage.css'; // CSS akan dibuat selanjutnya
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+import './OrderHistoryPage.css';
 
 const OrderHistoryPage = () => {
-  // Data ini seharusnya datang dari API, untuk saat ini kita gunakan data dummy
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulasi fetch data dari API
-    setTimeout(() => {
-      setOrders([
-        { id: 'ORD001', date: '2025-08-28', total: 350000, status: 'Selesai' },
-        { id: 'ORD002', date: '2025-08-30', total: 500000, status: 'Dikirim' },
-        { id: 'ORD003', date: '2025-09-01', total: 275000, status: 'Pending' }
-      ]);
-      setIsLoading(false);
-    }, 1000);
+    const fetchOrderHistory = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const { data } = await axios.get('http://localhost:5000/api/orders/my-orders', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setOrders(data);
+      } catch (error) {
+        console.error("Gagal mengambil riwayat pesanan:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchOrderHistory();
   }, []);
   
   const formatPrice = (price) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(price);
   };
-  
-  const getStatusClass = (status) => {
+
+  const getStatusDisplay = (status) => {
     switch (status.toLowerCase()) {
-      case 'selesai': return 'status-completed';
-      case 'dikirim': return 'status-shipped';
-      case 'pending': return 'status-pending';
-      case 'dibatalkan': return 'status-cancelled';
-      default: return '';
+      case 'selesai': return { text: 'Selesai', className: 'status-completed' };
+      case 'dikirim': return { text: 'Dikirim', className: 'status-shipped' };
+      case 'dibatalkan': return { text: 'Dibatalkan', className: 'status-cancelled' };
+      case 'pending':
+      default:
+        return { text: 'Pending', className: 'status-pending' };
     }
   };
 
@@ -41,19 +51,25 @@ const OrderHistoryPage = () => {
         <p>Anda belum memiliki riwayat pesanan.</p>
       ) : (
         <div className="orders-list">
-          {orders.map(order => (
-            <div key={order.id} className="order-card">
-              <div className="order-details">
-                <span className="order-id">#{order.id}</span>
-                <span className="order-date">Tanggal: {new Date(order.date).toLocaleDateString('id-ID')}</span>
-                <span className="order-total">{formatPrice(order.total)}</span>
+          {orders.map(order => {
+            const statusInfo = getStatusDisplay(order.status);
+            return (
+              <div key={order.id} className="order-card">
+                <div className="order-details">
+                  <span className="order-id">#{order.id}</span>
+                  <span className="order-date">Tanggal: {new Date(order.created_at).toLocaleDateString('id-ID')}</span>
+                  <span className="order-total">{formatPrice(order.total_pembayaran)}</span>
+                </div>
+                <div className="order-actions">
+                  <span className={`order-status ${statusInfo.className}`}>{statusInfo.text}</span>
+                  {/* 2. Ubah <button> menjadi <Link> */}
+                  <Link to={`/order/${order.id}`} className="btn-details">
+                    Lihat Detail
+                  </Link>
+                </div>
               </div>
-              <div className="order-actions">
-                <span className={`order-status ${getStatusClass(order.status)}`}>{order.status}</span>
-                <button className="btn-details">Lihat Detail</button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

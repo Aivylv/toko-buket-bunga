@@ -14,7 +14,8 @@ import CartPage from './pages/buyer/CartPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import OrderHistoryPage from './pages/buyer/OrderHistoryPage';
-import PlaceOrderPage from './pages/buyer/PlaceOrderPage'; // <-- Import halaman baru
+import PlaceOrderPage from './pages/buyer/PlaceOrderPage';
+import OrderDetailPage from './pages/buyer/OrderDetailPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
@@ -61,6 +62,7 @@ const AppLayout = () => {
           {/* Rute yang Dilindungi untuk Buyer */}
           <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
           <Route path="/my-orders" element={<ProtectedRoute><OrderHistoryPage /></ProtectedRoute>} />
+          <Route path="/order/:orderId" element={<ProtectedRoute><OrderDetailPage /></ProtectedRoute>} /> {/* <-- Tambahkan Rute Baru */}
           <Route path="/place-order" element={<ProtectedRoute><PlaceOrderPage /></ProtectedRoute>} />
           
           {/* Rute Admin */}

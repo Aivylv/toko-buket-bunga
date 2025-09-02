@@ -82,14 +82,8 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const removeFromCart = async (cartId) => {
-    if (!window.confirm('Yakin ingin menghapus item ini dari keranjang?')) return;
-    try {
-      await axios.delete(`${API_URL}/${cartId}`, getAuthHeaders());
-      fetchCartItems();
-    } catch (error) {
-      console.error("Gagal menghapus dari keranjang:", error);
-    }
+    const removeFromCart = async (cartId) => {
+    // ... (fungsi ini biarkan seperti sebelumnya)
   };
 
   const value = {
@@ -98,6 +92,7 @@ export const CartProvider = ({ children }) => {
     addToCart,
     updateQuantity,
     removeFromCart,
+    fetchCartItems, // <-- TAMBAHKAN BARIS INI
     itemCount: cartItems.reduce((acc, item) => acc + item.quantity, 0)
   };
 

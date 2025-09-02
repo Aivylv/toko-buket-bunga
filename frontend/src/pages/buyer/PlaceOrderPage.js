@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import './PlaceOrderPage.css'; // Kita akan buat file CSS ini nanti
+import axios from 'axios';
+import { useAuth } from '../../context/AuthContext'; // Import useAuth
+import { useCart } from '../../context/CartContext'; // Import useCart
+import './PlaceOrderPage.css';
 
 const PlaceOrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { currentUser } = useAuth();
+  const { fetchCartItems } = useCart(); // Ambil fungsi untuk refresh cart
 
-  // Ambil data cart dari state navigasi
   const { cartItems, subtotal } = location.state || { cartItems: [], subtotal: 0 };
   
   const [shippingInfo, setShippingInfo] = useState({
-    namaPenerima: '',
+    namaPenerima: currentUser?.name || '',
     noHp: '',
     alamat: ''
   });
@@ -20,36 +24,45 @@ const PlaceOrderPage = () => {
     setShippingInfo(prevState => ({ ...prevState, [name]: value }));
   };
 
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
     if (!shippingInfo.namaPenerima || !shippingInfo.noHp || !shippingInfo.alamat) {
       alert('Harap isi semua informasi pengiriman.');
       return;
     }
 
-    // Gabungkan data pesanan
+    const shippingCost = 20000;
     const orderData = {
       shippingInfo,
       orderItems: cartItems,
       subtotal,
-      shippingCost: 20000,
-      total: subtotal + 20000
+      total: subtotal + shippingCost
     };
 
-    // Di aplikasi nyata, data ini akan dikirim ke backend API
-    console.log('Order Data:', orderData);
-    
-    alert('Pesanan berhasil dibuat!');
-    // Arahkan ke halaman riwayat pesanan setelah berhasil
-    navigate('/my-orders');
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5000/api/orders', orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      alert('Pesanan berhasil dibuat!');
+      fetchCartItems(); // Kosongkan keranjang di frontend
+      navigate('/my-orders');
+    } catch (error) {
+      console.error('Order creation failed:', error);
+      alert('Gagal membuat pesanan. ' + (error.response?.data?.message || ''));
+    }
   };
   
   const formatPrice = (price) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(price);
   };
   
-  if (cartItems.length === 0) {
-    navigate('/cart');
+  if (!cartItems || cartItems.length === 0) {
+    // Redirect jika tidak ada item
+    React.useEffect(() => navigate('/cart'), [navigate]);
     return null;
   }
 
