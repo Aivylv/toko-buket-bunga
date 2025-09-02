@@ -13,7 +13,7 @@ const auth = async (req, res, next) => {
     
     // Verify user still exists in database
     const [users] = await db.promise().query(
-      'SELECT id, name, email, role FROM users WHERE id = ?',
+      'SELECT id, nama_user, email, role FROM users WHERE id = ?',
       [decoded.id]
     );
     
@@ -21,7 +21,13 @@ const auth = async (req, res, next) => {
       return res.status(401).json({ message: 'Token is not valid' });
     }
     
-    req.user = users[0];
+    const user = users[0];
+    req.user = {
+        id: user.id,
+        name: user.nama_user,
+        email: user.email,
+        role: user.role
+    };
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);

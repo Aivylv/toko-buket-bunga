@@ -29,9 +29,9 @@ router.post('/register', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     
-    // Insert user
+    // PERBAIKAN: Menggunakan kolom `nama_user` sesuai dengan database Anda
     const [result] = await db.promise().query(
-      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+      'INSERT INTO users (nama_user, email, password, role) VALUES (?, ?, ?, ?)',
       [name, email, hashedPassword, 'buyer']
     );
     
@@ -91,12 +91,13 @@ router.post('/login', async (req, res) => {
       { expiresIn: '7d' }
     );
     
+    // PERBAIKAN: Mengambil dari `nama_user` dan mengirimnya sebagai `name`
     res.json({
       message: 'Login successful',
       token,
       user: { 
         id: user.id, 
-        name: user.name, 
+        name: user.nama_user, 
         email: user.email, 
         role: user.role 
       }
@@ -118,8 +119,9 @@ router.get('/profile', async (req, res) => {
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
+    // PERBAIKAN: Memilih kolom `nama_user`
     const [users] = await db.promise().query(
-      'SELECT id, name, email, role, created_at FROM users WHERE id = ?',
+      'SELECT id, nama_user, email, role, created_at FROM users WHERE id = ?',
       [decoded.id]
     );
     
@@ -127,7 +129,15 @@ router.get('/profile', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    res.json({ user: users[0] });
+    const user = users[0];
+    // PERBAIKAN: Mengirim `nama_user` sebagai `name`
+    res.json({ user: {
+      id: user.id,
+      name: user.nama_user,
+      email: user.email,
+      role: user.role,
+      created_at: user.created_at
+    }});
   } catch (error) {
     console.error('Profile error:', error);
     if (error.name === 'JsonWebTokenError') {

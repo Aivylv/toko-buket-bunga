@@ -1,14 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './Admin.css';
 
 const AdminProducts = () => {
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Buket Mawar Merah', price: 310000, stock: 15, category: 'Mawar', status: 'Aktif' },
-    { id: 2, name: 'Buket Lavender', price: 350000, stock: 8, category: 'Lavender', status: 'Aktif' },
-    { id: 3, name: 'Buket Mixed Flowers', price: 500000, stock: 12, category: 'Campuran', status: 'Aktif' },
-    { id: 4, name: 'Buket Tulip', price: 275000, stock: 0, category: 'Tulip', status: 'Tidak Aktif' }
-  ]);
-
+  const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState({
@@ -16,8 +11,17 @@ const AdminProducts = () => {
     price: '',
     stock: '',
     category: '',
-    status: 'Aktif'
+    description: '',
   });
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    const { data } = await axios.get('http://localhost:5000/api/products');
+    setProducts(data);
+  };
 
   const handleEdit = (product) => {
     setEditingProduct(product);
@@ -25,32 +29,32 @@ const AdminProducts = () => {
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
-      setProducts(products.filter(product => product.id !== id));
+      await axios.delete(`http://localhost:5000/api/products/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      fetchProducts();
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (editingProduct) {
-      // Edit existing product
-      setProducts(products.map(product => 
-        product.id === editingProduct.id ? { ...formData, id: editingProduct.id } : product
-      ));
+      await axios.put(`http://localhost:5000/api/products/${editingProduct.id}`, formData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
     } else {
-      // Add new product
-      const newProduct = {
-        ...formData,
-        id: Math.max(...products.map(p => p.id)) + 1
-      };
-      setProducts([...products, newProduct]);
+      await axios.post('http://localhost:5000/api/products', formData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
     }
     setShowModal(false);
     setEditingProduct(null);
-    setFormData({ name: '', price: '', stock: '', category: '', status: 'Aktif' });
+    setFormData({ name: '', price: '', stock: '', category: '', description: '' });
+    fetchProducts();
   };
-
+  
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -69,7 +73,7 @@ const AdminProducts = () => {
         <div className="admin-actions">
           <button 
             className="btn-primary"
-            onClick={() => setShowModal(true)}
+            onClick={() => { setEditingProduct(null); setShowModal(true); }}
           >
             <i className="fas fa-plus"></i> Tambah Produk
           </button>
@@ -83,7 +87,6 @@ const AdminProducts = () => {
                 <th>Harga</th>
                 <th>Stok</th>
                 <th>Kategori</th>
-                <th>Status</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -94,11 +97,6 @@ const AdminProducts = () => {
                   <td>Rp {product.price.toLocaleString('id-ID')}</td>
                   <td>{product.stock}</td>
                   <td>{product.category}</td>
-                  <td>
-                    <span className={`status-badge status-${product.status.toLowerCase().replace(' ', '-')}`}>
-                      {product.status}
-                    </span>
-                  </td>
                   <td>
                     <div className="action-buttons">
                       <button 
@@ -121,7 +119,6 @@ const AdminProducts = () => {
           </table>
         </div>
 
-        {/* Modal untuk tambah/edit produk */}
         {showModal && (
           <div className="modal-overlay">
             <div className="modal">
@@ -152,6 +149,15 @@ const AdminProducts = () => {
                     required
                   />
                 </div>
+                 <div className="form-group">
+                  <label>Deskripsi</label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
                 <div className="form-group">
                   <label>Stok</label>
                   <input
@@ -176,18 +182,6 @@ const AdminProducts = () => {
                     <option value="Tulip">Tulip</option>
                     <option value="Campuran">Campuran</option>
                     <option value="Baby's Breath">Baby's Breath</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Status</label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="Aktif">Aktif</option>
-                    <option value="Tidak Aktif">Tidak Aktif</option>
                   </select>
                 </div>
                 <div className="modal-actions">

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -10,85 +11,45 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Simulasi database users
-  const [users, setUsers] = useState([
-    { 
-      id: 1, 
-      name: 'Admin', 
-      email: 'admin@florist.com', 
-      password: 'admin123', 
-      role: 'admin', 
-      joinDate: '2023-01-01', 
-      status: 'active' 
-    },
-    { 
-      id: 2, 
-      name: 'Budi Santoso', 
-      email: 'budi@email.com', 
-      password: 'budi123', 
-      role: 'admin', 
-      joinDate: '2023-09-05', 
-      status: 'active' 
-    }
-  ]);
-
   useEffect(() => {
-    // Check if user is logged in from localStorage
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.get('http://localhost:5000/api/auth/profile', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).then(res => {
+        setCurrentUser(res.data.user);
+      }).catch(() => {
+        localStorage.removeItem('token');
+      });
     }
     setLoading(false);
   }, []);
 
   const register = async (userData) => {
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const newUser = {
-        id: Math.max(...users.map(u => u.id)) + 1,
-        ...userData,
-        joinDate: new Date().toISOString().split('T')[0],
-        status: 'active'
-      };
-      
-      setUsers(prevUsers => [...prevUsers, newUser]);
-      
-      // Auto login after register
-      const { password, ...userWithoutPassword } = newUser;
-      setCurrentUser(userWithoutPassword);
-      localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
-      
-      return { success: true, user: userWithoutPassword };
+      const response = await axios.post('http://localhost:5000/api/auth/register', userData);
+      localStorage.setItem('token', response.data.token);
+      setCurrentUser(response.data.user);
+      return { success: true, user: response.data.user };
     } catch (error) {
-      return { success: false, error: 'Registration failed' };
+      return { success: false, error: error.response.data.message || 'Registration failed' };
     }
   };
 
   const login = async (email, password) => {
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const user = users.find(u => u.email === email && u.password === password);
-      
-      if (user) {
-        const { password, ...userWithoutPassword } = user;
-        setCurrentUser(userWithoutPassword);
-        localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
-        return { success: true, user: userWithoutPassword };
-      } else {
-        return { success: false, error: 'Invalid email or password' };
-      }
+      const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      localStorage.setItem('token', response.data.token);
+      setCurrentUser(response.data.user);
+      return { success: true, user: response.data.user };
     } catch (error) {
-      return { success: false, error: 'Login failed' };
+      return { success: false, error: error.response.data.message || 'Invalid email or password' };
     }
   };
 
   const logout = () => {
     setCurrentUser(null);
-    localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
   };
 
   const value = {
@@ -96,7 +57,6 @@ export const AuthProvider = ({ children }) => {
     register,
     login,
     logout,
-    users
   };
 
   return (

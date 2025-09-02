@@ -59,6 +59,15 @@ try {
   console.error('✗ Error loading review routes:', error.message);
 }
 
+try {
+  const userRoutes = require('./routes/users');
+  console.log('✓ User routes loaded successfully');
+  app.use('/api/users', userRoutes);
+} catch (error) {
+    console.error('✗ Error loading user routes:', error.message);
+}
+
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

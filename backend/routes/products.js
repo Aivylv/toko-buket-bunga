@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const [products] = await db.promise().query(`
-      SELECT p.*, AVG(r.rating) as avg_rating 
+      SELECT p.id, p.nama_produk as name, p.harga as price, p.stok as stock, p.deskripsi as description, p.category, AVG(r.rating) as avg_rating 
       FROM products p 
       LEFT JOIN reviews r ON p.id = r.product_id 
       GROUP BY p.id
@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const [products] = await db.promise().query(`
-      SELECT p.*, AVG(r.rating) as avg_rating 
+      SELECT p.id, p.nama_produk as name, p.harga as price, p.stok as stock, p.deskripsi as description, p.category, AVG(r.rating) as avg_rating 
       FROM products p 
       LEFT JOIN reviews r ON p.id = r.product_id 
       WHERE p.id = ?
@@ -35,7 +35,7 @@ router.get('/:id', async (req, res) => {
     
     // Get reviews for this product
     const [reviews] = await db.promise().query(`
-      SELECT r.*, u.name 
+      SELECT r.*, u.nama_user as name 
       FROM reviews r 
       JOIN users u ON r.user_id = u.id 
       WHERE r.product_id = ?
@@ -53,7 +53,7 @@ router.post('/', auth, adminAuth, async (req, res) => {
   
   try {
     const [result] = await db.promise().query(
-      'INSERT INTO products (name, description, price, stock, category) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO products (nama_produk, deskripsi, harga, stok, category) VALUES (?, ?, ?, ?, ?)',
       [name, description, price, stock, category]
     );
     
@@ -72,7 +72,7 @@ router.put('/:id', auth, adminAuth, async (req, res) => {
   
   try {
     const [result] = await db.promise().query(
-      'UPDATE products SET name = ?, description = ?, price = ?, stock = ?, category = ? WHERE id = ?',
+      'UPDATE products SET nama_produk = ?, deskripsi = ?, harga = ?, stok = ?, category = ? WHERE id = ?',
       [name, description, price, stock, category, req.params.id]
     );
     
