@@ -657,3 +657,183 @@
 .modal::-webkit-scrollbar-thumb:hover {
   background: #a0aec0;
 }
+
+/* Tambahkan di akhir file Admin.css */
+.product-table-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.image-preview {
+  display: block;
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/*---------------------------------------------------------*/
+
+/* Tambahkan di akhir file Admin.css */
+
+/* Error message styling */
+.error-message {
+  background-color: #fed7d7;
+  color: #742a2a;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border-left: 4px solid #f56565;
+}
+
+/* Loading styling */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #718096;
+  font-size: 1.1rem;
+}
+
+/* Empty data message */
+.empty-data-message {
+  text-align: center;
+  padding: 60px 20px;
+  color: #a0aec0;
+}
+
+.empty-data-message i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.empty-data-message p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Stock status */
+.out-of-stock {
+  color: #f56565;
+  font-weight: 600;
+}
+
+.in-stock {
+  color: #38a169;
+  font-weight: 500;
+}
+
+/* Category badge */
+.category-badge {
+  background-color: #e9d8fd;
+  color: #553c9a;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Upload progress */
+.upload-progress {
+  background-color: #e2e8f0;
+  border-radius: 20px;
+  height: 20px;
+  margin: 15px 0;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background-color: #4299e1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: width 0.3s ease;
+}
+
+/* Form textarea */
+.modal-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal-form textarea:focus {
+  outline: none;
+  border-color: #d53f8c;
+}
+
+/* Form file input */
+.modal-form input[type="file"] {
+  padding: 8px;
+}
+
+.modal-form small {
+  color: #718096;
+  font-size: 0.8rem;
+  display: block;
+  margin-top: 5px;
+}
+
+/* Status select styling */
+.status-select {
+  padding: 6px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: #d53f8c;
+}
+
+.status-pending {
+  background-color: #fed7d7;
+  color: #742a2a;
+}
+
+.status-selesai {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.status-dibatalkan {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+/* Responsive improvements */
+@media screen and (max-width: 768px) {
+  .admin-table {
+    font-size: 0.8rem;
+  }
+  
+  .product-table-image {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .btn-edit, .btn-delete {
+    padding: 6px 8px;
+    font-size: 0.7rem;
+  }
+}

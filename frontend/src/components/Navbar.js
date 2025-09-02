@@ -18,47 +18,61 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className="navbar">
       <div className="nav-container">
-        <Link to="/" className="nav-logo">
+        <Link to="/" className="nav-logo" onClick={closeMenu}>
           FLORIST
         </Link>
 
         <div className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
-          <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>
-            Home
-          </Link>
-          <Link to="/products" className="nav-link" onClick={() => setIsMenuOpen(false)}>
-            Products
-          </Link>
           
-          {currentUser ? (
-            <>
-              {currentUser.role === 'admin' && (
-                <Link to="/admin" className="nav-link" onClick={() => setIsMenuOpen(false)}>
-                  Admin Panel
-                </Link>
-              )}
-              <Link to="/cart" className="nav-link" onClick={() => setIsMenuOpen(false)}>
-                <i className="fas fa-shopping-cart"></i> Cart
-              </Link>
-              <div className="nav-user">
-                <span>Hello, {currentUser.name}</span>
-                <button onClick={handleLogout} className="nav-logout">
-                  Logout
-                </button>
-              </div>
-            </>
+          {/* Menu Utama Berdasarkan Peran */}
+          {currentUser && currentUser.role === 'admin' ? (
+            <Link to="/admin" className="nav-link" onClick={closeMenu}>
+              Admin Panel
+            </Link>
           ) : (
             <>
-              <Link to="/login" className="nav-link" onClick={() => setIsMenuOpen(false)}>
-                Login
+              <Link to="/" className="nav-link" onClick={closeMenu}>
+                Home
               </Link>
-              <Link to="/register" className="nav-link" onClick={() => setIsMenuOpen(false)}>
-                Register
+              <Link to="/products" className="nav-link" onClick={closeMenu}>
+                Products
               </Link>
             </>
+          )}
+
+          {/* Menu Khusus untuk Buyer yang sudah Login */}
+          {currentUser && currentUser.role === 'buyer' && (
+            <>
+              <Link to="/cart" className="nav-link" onClick={closeMenu}>
+                Cart
+              </Link>
+              <Link to="/my-orders" className="nav-link" onClick={closeMenu}>
+                Riwayat Pesanan
+              </Link>
+            </>
+          )}
+          
+          {/* Info Login/Logout */}
+          {currentUser ? (
+            <div className="nav-user">
+              <span>Hello, {currentUser.name || 'User'}</span>
+              <button onClick={handleLogout} className="nav-logout">
+                Logout
+              </button>
+            </div>
+          ) : (
+            ! (currentUser && currentUser.role === 'admin') && (
+              <Link to="/login" className="nav-link" onClick={closeMenu}>
+                Login
+              </Link>
+            )
           )}
         </div>
 

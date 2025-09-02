@@ -1,28 +1,65 @@
-import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './Admin.css';
 
+const API_URL = 'http://localhost:5000/api/users';
+
 const AdminUsers = () => {
-  const { users } = useAuth();
+  const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  
   const [formData, setFormData] = useState({
-    name: '',
+    nama_user: '',
     email: '',
     role: 'buyer',
     status: 'active'
   });
 
-  const handleEdit = (user) => {
-    setEditingUser(user);
-    setFormData(user);
-    setShowModal(true);
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const { data } = await axios.get(API_URL);
+      setUsers(data);
+    } catch (error) {
+      console.error("Gagal mengambil data user:", error);
+    }
   };
 
-  const handleChange = (e) => {
+  const handleEdit = (user) => {
+    setIsEditing(true);
+    setCurrentUser(user);
     setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+      nama_user: user.nama_user,
+      email: user.email,
+      role: user.role,
+      status: user.status
+    });
+    setShowModal(true);
+  };
+  
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`${API_URL}/${currentUser.id}`, formData);
+      setShowModal(false);
+      fetchUsers();
+    } catch (error) {
+      console.error("Gagal mengupdate user:", error);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('id-ID', {
+      day: '2-digit', month: 'long', year: 'numeric'
     });
   };
 
@@ -49,25 +86,14 @@ const AdminUsers = () => {
             <tbody>
               {users.map(user => (
                 <tr key={user.id}>
-                  <td>{user.name}</td>
+                  <td>{user.nama_user}</td>
                   <td>{user.email}</td>
-                  <td>
-                    <span className={`role-badge role-${user.role}`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td>{user.joinDate}</td>
-                  <td>
-                    <span className={`status-badge status-${user.status}`}>
-                      {user.status}
-                    </span>
-                  </td>
+                  <td><span className={`role-badge role-${user.role}`}>{user.role}</span></td>
+                  <td>{formatDate(user.created_at)}</td>
+                  <td><span className={`status-badge status-${user.status}`}>{user.status}</span></td>
                   <td>
                     <div className="action-buttons">
-                      <button 
-                        className="btn-edit"
-                        onClick={() => handleEdit(user)}
-                      >
+                      <button className="btn-edit" onClick={() => handleEdit(user)}>
                         <i className="fas fa-edit"></i>
                       </button>
                     </div>
@@ -78,68 +104,39 @@ const AdminUsers = () => {
           </table>
         </div>
 
-        {/* Modal untuk edit user */}
         {showModal && (
           <div className="modal-overlay">
             <div className="modal">
               <div className="modal-header">
-                <h3>Edit User</h3>
-                <button className="modal-close" onClick={() => setShowModal(false)}>
-                  <i className="fas fa-times"></i>
-                </button>
+                <h3>Edit User: {currentUser.nama_user}</h3>
+                <button className="modal-close" onClick={() => setShowModal(false)}>&times;</button>
               </div>
-              <form className="modal-form">
+              <form onSubmit={handleSubmit} className="modal-form">
                 <div className="form-group">
                   <label>Nama Lengkap</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
+                  <input type="text" name="nama_user" value={formData.nama_user} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
                   <label>Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
+                  <input type="email" name="email" value={formData.email} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
                   <label>Role</label>
-                  <select
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                    required
-                  >
+                  <select name="role" value={formData.role} onChange={handleChange} required>
                     <option value="buyer">Buyer</option>
                     <option value="admin">Admin</option>
                   </select>
                 </div>
                 <div className="form-group">
                   <label>Status</label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    required
-                  >
+                  <select name="status" value={formData.status} onChange={handleChange} required>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                   </select>
                 </div>
                 <div className="modal-actions">
-                  <button type="button" onClick={() => setShowModal(false)}>
-                    Batal
-                  </button>
-                  <button type="button" className="btn-primary">
-                    Update
-                  </button>
+                  <button type="button" onClick={() => setShowModal(false)}>Batal</button>
+                  <button type="submit" className="btn-primary">Update</button>
                 </div>
               </form>
             </div>
