@@ -49,7 +49,7 @@ const LoginPage = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>Login ke FLORIST</h2>
+        <h2>Login ke FLORIST.</h2>
         <p className="auth-subtitle">Masuk untuk melanjutkan belanja</p>
         
         {error && <div className="error-message">{error}</div>}

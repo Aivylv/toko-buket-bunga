@@ -1,61 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import ProductCard from '../../components/ProductCard';
 import './ProductPage.css';
 
+// URL dari backend API Anda
+const API_URL = 'http://localhost:5000/api/products';
+const BASE_URL = 'http://localhost:5000/';
+
 const ProductPage = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  
-  // Data produk contoh
-  const products = [
-    {
-      id: 1,
-      name: "Buket Mawar Merah",
-      price: 310000,
-      image: "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8cm9zZSUyMGJvdXF1ZXR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
-      description: "Buket mawar merah segar dengan packaging eksklusif",
-      category: "mawar"
-    },
-    {
-      id: 2,
-      name: "Buket Lavender",
-      price: 350000,
-      image: "https://images.unsplash.com/photo-1563241527-3004b7be0ffd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGxhdmVuZGVyJTIwYm91cXVldHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
-      description: "Buket lavender wangi yang tahan lama",
-      category: "lavender"
-    },
-    {
-      id: 3,
-      name: "Buket Mixed Flowers",
-      price: 500000,
-      image: "https://images.unsplash.com/photo-1487530811176-3780de880c2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjB8fGZsb3dlciUyMGJvdXF1ZXR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
-      description: "Kombinasi berbagai bunga segar pilihan",
-      category: "campuran"
-    },
-    {
-      id: 4,
-      name: "Buket Tulip",
-      price: 275000,
-      image: "https://images.unsplash.com/photo-1578948850696-322adf023a82?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTZ8fHR1bGlwJTIwYm91cXVldHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
-      description: "Buket tulip warna-warni yang cerah",
-      category: "tulip"
-    },
-    {
-      id: 5,
-      name: "Buket Mawar Putih",
-      price: 290000,
-      image: "https://images.unsplash.com/photo-1563241527-3004b7be0ffd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGxhdmVuZGVyJTIwYm91cXVldHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
-      description: "Buket mawar putih elegan dan berkelas",
-      category: "mawar"
-    },
-    {
-      id: 6,
-      name: "Buket Baby's Breath",
-      price: 230000,
-      image: "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8cm9zZSUyMGJvdXF1ZXR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
-      description: "Buket baby's breath yang lembut dan romantis",
-      category: "baby-breath"
-    }
-  ];
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data } = await axios.get(API_URL);
+        // Memformat URL gambar sebelum disimpan ke state
+        const formattedProducts = data.map(product => ({
+          ...product,
+          // Menggunakan nama kolom yang konsisten
+          name: product.nama_produk,
+          price: parseFloat(product.harga),
+          image: product.gambar ? `${BASE_URL}${product.gambar.replace(/\\/g, '/')}` : 'https://placehold.co/600x400',
+          description: product.deskripsi,
+          category: product.kategori.toLowerCase()
+        }));
+        setProducts(formattedProducts);
+      } catch (err) {
+        setError('Gagal memuat data produk. Silakan coba lagi nanti.');
+        console.error("Error fetching products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const categories = [
     { id: 'all', name: 'Semua Produk' },
@@ -63,20 +45,27 @@ const ProductPage = () => {
     { id: 'tulip', name: 'Buket Tulip' },
     { id: 'lavender', name: 'Buket Lavender' },
     { id: 'campuran', name: 'Buket Campuran' },
-    { id: 'baby-breath', name: "Baby's Breath" }
+    { id: 'lainnya', name: "Lainnya" }
   ];
 
-  const filteredProducts = selectedCategory === 'all' 
-    ? products 
+  const filteredProducts = selectedCategory === 'all'
+    ? products
     : products.filter(product => product.category === selectedCategory);
+
+  if (loading) {
+    return <div className="product-page"><div className="container"><p>Memuat produk...</p></div></div>;
+  }
+
+  if (error) {
+    return <div className="product-page"><div className="container"><p className="error-message">{error}</p></div></div>;
+  }
 
   return (
     <div className="product-page">
       <div className="container">
         <h1>Katalog Produk</h1>
-        <p className="page-subtitle">Temukan buket bunga perfect untuk setiap moment</p>
-        
-        {/* Filter Kategori */}
+        <p className="page-subtitle">Temukan buket bunga sempurna untuk setiap momen</p>
+
         <div className="category-filter">
           {categories.map(category => (
             <button
@@ -88,26 +77,25 @@ const ProductPage = () => {
             </button>
           ))}
         </div>
-        
-        {/* Daftar Produk */}
+
         <div className="products-grid">
-          {filteredProducts.map(product => (
-            <ProductCard 
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              price={product.price}
-              image={product.image}
-              description={product.description}
-            />
-          ))}
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map(product => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                image={product.image}
+                description={product.description}
+              />
+            ))
+          ) : (
+            <div className="no-products">
+              <p>Tidak ada produk dalam kategori ini.</p>
+            </div>
+          )}
         </div>
-        
-        {filteredProducts.length === 0 && (
-          <div className="no-products">
-            <p>Tidak ada produk dalam kategori ini.</p>
-          </div>
-        )}
       </div>
     </div>
   );

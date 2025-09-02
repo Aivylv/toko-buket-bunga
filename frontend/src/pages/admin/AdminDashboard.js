@@ -27,7 +27,7 @@ const AdminDashboard = () => {
         {/* Header */}
         <div className="admin-header">
           <h1>Admin Dashboard</h1>
-          <p>Selamat datang di panel admin FLORIST</p>
+          <p>Selamat datang di panel admin FLORIST.</p>
         </div>
 
         {/* Statistik */}

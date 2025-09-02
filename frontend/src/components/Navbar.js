@@ -26,7 +26,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="nav-container">
         <Link to="/" className="nav-logo" onClick={closeMenu}>
-          FLORIST
+          FLORIST.
         </Link>
 
         <div className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
@@ -54,7 +54,7 @@ const Navbar = () => {
                 Cart
               </Link>
               <Link to="/my-orders" className="nav-link" onClick={closeMenu}>
-                Riwayat Pesanan
+                Order History
               </Link>
             </>
           )}
