@@ -8,26 +8,26 @@
 
 **FLORYN** adalah aplikasi web E-commerce lengkap yang dibangun dengan MERN stack (MySQL, Express.js, React.js, Node.js). Aplikasi ini menyediakan platform yang fungsional dan modern bagi pelanggan untuk membeli buket bunga dan bagi administrator untuk mengelola toko.
 
-## ✨ Fitur Utama
+## Fitur Utama
 
 - **Untuk Pembeli:**
-    - 🎨 **Katalog Produk:** Melihat katalog buket bunga dengan filter berdasarkan kategori.
-    - 📄 **Detail Produk:** Melihat informasi rinci untuk setiap produk.
-    - 🛒 **Keranjang Belanja:** Menambah, mengubah kuantitas, dan menghapus produk dari keranjang.
-    - 🚚 **Proses Checkout:** Melakukan pemesanan dengan mengisi informasi pengiriman.
-    - 📜 **Riwayat Pesanan:** Melihat riwayat semua pesanan yang pernah dibuat beserta detailnya.
-    - 🔑 **Otentikasi:** Sistem registrasi dan login yang aman menggunakan JWT.
+    - **Katalog Produk:** Melihat katalog buket bunga dengan filter berdasarkan kategori.
+    - **Detail Produk:** Melihat informasi rinci untuk setiap produk.
+    - **Keranjang Belanja:** Menambah, mengubah kuantitas, dan menghapus produk dari keranjang.
+    - **Proses Checkout:** Melakukan pemesanan dengan mengisi informasi pengiriman.
+    - **Riwayat Pesanan:** Melihat riwayat semua pesanan yang pernah dibuat beserta detailnya.
+    - **Otentikasi:** Sistem registrasi dan login yang aman menggunakan JWT.
 
 - **Untuk Admin:**
-    - 📊 **Dashboard:** Halaman utama dengan statistik ringkas mengenai total produk, pesanan, dan pengguna.
-    - 💐 **Manajemen Produk:** Operasi CRUD (Create, Read, Update, Delete) lengkap untuk produk, termasuk fitur upload gambar.
-    - 📦 **Manajemen Pesanan:** Melihat semua pesanan dari pelanggan dan mengubah status pesanan (pending, diproses, dikirim, selesai, dibatalkan).
-    - 👥 **Manajemen Pengguna:** Mengelola data pengguna yang terdaftar di sistem (CRUD).
-    - 📄 **Cetak PDF:** Fitur untuk mengunduh laporan pesanan dalam format PDF.
+    - **Dashboard:** Halaman utama dengan statistik ringkas mengenai total produk, pesanan, dan pengguna.
+    - **Manajemen Produk:** Operasi CRUD (Create, Read, Update, Delete) lengkap untuk produk, termasuk fitur upload gambar.
+    - **Manajemen Pesanan:** Melihat semua pesanan dari pelanggan dan mengubah status pesanan (pending, diproses, dikirim, selesai, dibatalkan).
+    - **Manajemen Pengguna:** Mengelola data pengguna yang terdaftar di sistem (CRUD).
+    - **Cetak PDF:** Fitur untuk mengunduh laporan pesanan dalam format PDF.
 
 ---
 
-## 🛠️ Pemenuhan Spesifikasi Proyek
+## Pemenuhan Spesifikasi Proyek
 
 Proyek ini telah memenuhi semua spesifikasi teknis dan fungsional yang diwajibkan.
 
@@ -51,7 +51,7 @@ Proyek ini telah memenuhi semua spesifikasi teknis dan fungsional yang diwajibka
 
 ---
 
-## 🚀 Instalasi dan Menjalankan Proyek
+## Instalasi dan Menjalankan Proyek
 
 ### Prasyarat
 - Node.js (v14 atau lebih baru)
