@@ -64,7 +64,7 @@ Proyek ini telah memenuhi semua spesifikasi teknis dan fungsional yang diwajibka
 3.  Impor file skema SQL yang ada di proyek ke dalam database yang baru dibuat.
 
 ### 2. Setup Backend
-```bash
+```
 # 1. Masuk ke direktori backend
 cd backend
 
@@ -75,9 +75,9 @@ npm install
 
 # 4. Jalankan server backend
 npm run dev
-
+```
 ### 3. Setup Frontend
-```bash
+```
 # 1. Buka terminal baru, masuk ke direktori frontend
 cd frontend
 
@@ -87,7 +87,7 @@ npm install
 # 3. Jalankan aplikasi React
 npm start
 ---
-
+```
 ## 👥 Kolaborator
 
 Terima kasih kepada para kontributor luar biasa yang telah membantu mewujudkan proyek ini:
