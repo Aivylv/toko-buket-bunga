@@ -1,6 +1,6 @@
 const express = require('express');
 const db = require('../config/database');
-const { auth } = require('../middleware/auth');
+const { auth, adminAuth } = require('../middleware/auth');
 const router = express.Router();
 
 // Get user's order history (Protected Route)
@@ -88,13 +88,8 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Get all orders (for admin)
-router.get('/', auth, async (req, res) => {
+router.get('/', auth, adminAuth, async (req, res) => {
   try {
-    // Check if user is admin
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Akses ditolak. Hanya admin yang dapat mengakses.' });
-    }
-
     const [orders] = await db.promise().query(`
       SELECT o.*, u.nama_user as customer_name, u.email as customer_email
       FROM orders o 
@@ -106,6 +101,27 @@ router.get('/', auth, async (req, res) => {
       ...order,
       total_pembayaran: parseFloat(order.total_pembayaran)
     }));
+    
+    const orderIds = formattedOrders.map(o => o.id);
+    if (orderIds.length > 0) {
+        const [items] = await db.promise().query(`
+            SELECT oi.*, p.nama_produk 
+            FROM order_items oi
+            JOIN products p ON oi.product_id = p.id
+            WHERE oi.order_id IN (?)
+        `, [orderIds]);
+
+        formattedOrders.forEach(order => {
+            order.items = items.filter(item => item.order_id === order.id).map(item => ({
+                ...item,
+                harga: parseFloat(item.harga)
+            }));
+        });
+    } else {
+        formattedOrders.forEach(order => {
+            order.items = [];
+        });
+    }
     
     res.json(formattedOrders);
   } catch (error) {
@@ -128,7 +144,6 @@ router.get('/:id', auth, async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
     
-    // Check access rights (admin or order owner)
     if (req.user.role !== 'admin' && orders[0].user_id !== req.user.id) {
       return res.status(403).json({ message: 'Akses ditolak' });
     }
@@ -156,14 +171,35 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
-// === PERBAIKAN DI SINI ===
-// Update order status (admin only)
-router.put('/:id/status', auth, async (req, res) => {
-  const { status } = req.body;
-  
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Akses ditolak. Hanya admin yang dapat mengupdate status.' });
+// Update order details (admin only)
+router.put('/:id', auth, adminAuth, async (req, res) => {
+  const { nama_penerima, alamat, no_hp } = req.body;
+
+  if (!nama_penerima || !alamat || !no_hp) {
+    return res.status(400).json({ message: 'Semua field wajib diisi.' });
   }
+
+  try {
+    const [result] = await db.promise().query(
+      'UPDATE orders SET nama_penerima = ?, alamat = ?, no_hp = ? WHERE id = ?',
+      [nama_penerima, alamat, no_hp, req.params.id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Pesanan tidak ditemukan' });
+    }
+
+    res.json({ message: 'Detail pesanan berhasil diupdate' });
+  } catch (error) {
+    console.error(`Error updating order ${req.params.id}:`, error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+
+// Update order status (admin only)
+router.put('/:id/status', auth, adminAuth, async (req, res) => {
+  const { status } = req.body;
   
   try {
     const validStatuses = ['pending', 'diproses', 'dikirim', 'selesai', 'dibatalkan'];
@@ -190,12 +226,7 @@ router.put('/:id/status', auth, async (req, res) => {
 });
 
 // Delete order (admin only)
-router.delete('/:id', auth, async (req, res) => {
-  // Check if user is admin
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Akses ditolak. Hanya admin yang dapat menghapus order.' });
-  }
-  
+router.delete('/:id', auth, adminAuth, async (req, res) => {
   const connection = await db.promise().getConnection();
   
   try {

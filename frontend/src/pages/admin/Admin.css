@@ -484,9 +484,17 @@
   }
   
   .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 20px;
   }
   
+  .admin-header > div:last-child {
+  display: flex;
+  gap: 10px;
+  }
+
   .admin-header h1 {
     font-size: 1.8rem;
   }
@@ -864,9 +872,8 @@
   color: #718096;
 }
 
-.btn-refresh {
+.btn-refresh, .btn-print {
   padding: 10px 15px;
-  background-color: #4299e1;
   color: white;
   border: none;
   border-radius: 6px;
@@ -874,10 +881,23 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-refresh {
+  background-color: #4299e1;
 }
 
 .btn-refresh:hover {
   background-color: #3182ce;
+}
+
+.btn-print {
+  background-color: #6B46C1; /* Warna ungu yang berbeda */
+}
+
+.btn-print:hover {
+  background-color: #553C9A;
 }
 
 .admin-table-container {
@@ -1135,5 +1155,375 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+  }
+}
+
+/* Tombol Lihat Detail */
+.btn-view {
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-view:hover {
+  background-color: #3182ce;
+}
+
+/* Modal Styles untuk Detail Pesanan */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #2d3748;
+  font-size: 1.4rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #718096;
+}
+
+.modal-close:hover {
+  color: #2d3748;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.order-detail-section {
+  margin-bottom: 25px;
+}
+
+.order-detail-section h3 {
+  margin: 0 0 15px 0;
+  color: #2d3748;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.order-detail-section p {
+  margin: 8px 0;
+  line-height: 1.5;
+  color: #4a5568;
+}
+
+.order-items-list {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.item-info h4 {
+  margin: 0 0 5px 0;
+  color: #2d3748;
+}
+
+.item-info p {
+  margin: 0;
+  color: #718096;
+}
+
+.item-total {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 5px 0;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px solid #2d3748;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #2d3748;
+}
+
+/* Buttons */
+.admin-actions {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-primary {
+  background-color: #d53f8c;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-primary:hover {
+  background-color: #b83280;
+}
+
+.btn-primary i {
+  margin-right: 8px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-edit, .btn-delete, .btn-view {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-edit {
+  background-color: #ecc94b;
+  color: #744210;
+}
+
+.btn-edit:hover {
+  background-color: #d69e2e;
+}
+
+.btn-delete {
+  background-color: #f56565;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #e53e3e;
+}
+
+.btn-view {
+  background-color: #4299e1;
+  color: white;
+}
+
+.btn-view:hover {
+  background-color: #3182ce;
+}
+
+/* Modal Styles untuk Detail dan Edit Pesanan */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal, .modal-content {
+  background: white;
+  border-radius: 8px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h2, .modal-header h3 {
+  margin: 0;
+  color: #2d3748;
+  font-size: 1.4rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #718096;
+}
+
+.modal-close:hover {
+  color: #2d3748;
+}
+
+.modal-body, .modal-form {
+  padding: 20px;
+}
+
+.order-detail-section {
+  margin-bottom: 25px;
+}
+
+.order-detail-section h3 {
+  margin: 0 0 15px 0;
+  color: #2d3748;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.order-detail-section p {
+  margin: 8px 0;
+  line-height: 1.5;
+  color: #4a5568;
+}
+
+.order-items-list {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.item-info h4 {
+  margin: 0 0 5px 0;
+  color: #2d3748;
+}
+
+.item-info p {
+  margin: 0;
+  color: #718096;
+}
+
+.item-total {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px solid #2d3748;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #2d3748;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  border: none;
+}
+
+.modal-actions button:first-child {
+    background-color: #e2e8f0;
+    color: #4a5568;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
