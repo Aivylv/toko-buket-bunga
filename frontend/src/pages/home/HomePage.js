@@ -1,40 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import ProductCard from '../../components/ProductCard';
 import './HomePage.css';
 
+const API_URL = 'http://localhost:5000/api/products';
+const BASE_URL = 'http://localhost:5000/';
+
 const HomePage = () => {
-  // Data produk contoh
-  const featuredProducts = [
-    {
-      id: 1,
-      name: "Buket Mawar Merah",
-      price: 310000,
-      image: "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8cm9zZSUyMGJvdXF1ZXR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
-      description: "Buket mawar merah segar dengan packaging eksklusif"
-    },
-    {
-      id: 2,
-      name: "Buket Lavender",
-      price: 350000,
-      image: "https://images.unsplash.com/photo-1563241527-3004b7be0ffd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGxhdmVuZGVyJTIwYm91cXVldHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
-      description: "Buket lavender wangi yang tahan lama"
-    },
-    {
-      id: 3,
-      name: "Buket Mixed Flowers",
-      price: 500000,
-      image: "https://images.unsplash.com/photo-1487530811176-3780de880c2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjB8fGZsb3dlciUyMGJvdXF1ZXR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
-      description: "Kombinasi berbagai bunga segar pilihan"
-    },
-    {
-      id: 4,
-      name: "Buket Tulip",
-      price: 275000,
-      image: "https://images.unsplash.com/photo-1578948850696-322adf023a82?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTZ8fHR1bGlwJTIwYm91cXVldHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
-      description: "Buket tulip warna-warni yang cerah"
-    }
-  ];
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data } = await axios.get(API_URL);
+        // Format URL gambar dan ambil 3 produk pertama
+        const formattedProducts = data.slice(0, 3).map(product => ({
+          ...product,
+          name: product.nama_produk,
+          price: parseFloat(product.harga),
+          image: product.gambar ? `${BASE_URL}${product.gambar.replace(/\\/g, '/')}` : 'https://placehold.co/600x400',
+          description: product.deskripsi
+        }));
+        setFeaturedProducts(formattedProducts);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <div className="homepage">
@@ -42,7 +40,8 @@ const HomePage = () => {
       <section className="hero">
         <div className="hero-content">
           <h1>Toko Buket Bunga Terbaik di Bantul</h1>
-          <p>Selamat Datang, ayo borong!</p>
+          <p>Ayo Bungakan dan Hidupkan Dunia!</p>
+          <p>Setiap Bunga Adalah Mimpi Dari Benih Kecil Yang Menjadi Nyata.</p>
           <Link to="/products" className="cta-button">Lihat Produk</Link>
         </div>
       </section>
@@ -50,18 +49,22 @@ const HomePage = () => {
       {/* Featured Products */}
       <section className="featured-products">
         <div className="container">
-          <h2>Produk Unggulan</h2>
-          <div className="products-grid">
-            {featuredProducts.map(product => (
-              <ProductCard 
-                key={product.id}
-                id={product.id}
-                name={product.name}
-                price={product.price}
-                image={product.image}
-                description={product.description}
-              />
-            ))}
+          <h2>Rekomendasi Buket</h2>
+          <div className="products-grid featured">
+            {loading ? (
+              <p>Memuat produk...</p>
+            ) : (
+              featuredProducts.map(product => (
+                <ProductCard 
+                  key={product.id}
+                  id={product.id}
+                  name={product.name}
+                  price={product.price}
+                  image={product.image}
+                  description={product.description}
+                />
+              ))
+            )}
           </div>
           <div className="view-all">
             <Link to="/products" className="view-all-btn">Lihat Semua Produk</Link>

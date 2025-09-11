@@ -6,47 +6,49 @@ const auth = async (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     
     if (!token) {
-      return res.status(401).json({ message: 'Access denied. No token provided.' });
+      return res.status(401).json({ message: 'Token tidak ditemukan, otorisasi ditolak' });
     }
     
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
     
-    // Verify user still exists in database
     const [users] = await db.promise().query(
       'SELECT id, nama_user, email, role FROM users WHERE id = ?',
       [decoded.id]
     );
     
     if (users.length === 0) {
-      return res.status(401).json({ message: 'Token is not valid' });
+      return res.status(401).json({ message: 'Token tidak valid - user tidak ditemukan' });
     }
     
-    const user = users[0];
     req.user = {
-        id: user.id,
-        name: user.nama_user,
-        email: user.email,
-        role: user.role
+      id: users[0].id,
+      name: users[0].nama_user,
+      email: users[0].email,
+      role: users[0].role
     };
+    
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
+    
     if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ message: 'Invalid token' });
+      return res.status(401).json({ message: 'Token tidak valid' });
     }
+    
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ message: 'Token expired' });
+      return res.status(401).json({ message: 'Token kedaluwarsa' });
     }
-    res.status(500).json({ message: 'Server error' });
+    
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
 const adminAuth = (req, res, next) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Access denied. Admin required.' });
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(403).json({ message: 'Akses ditolak. Rute ini hanya untuk admin.' });
   }
-  next();
 };
 
-// Ekspor sebagai object yang berisi fungsi
 module.exports = { auth, adminAuth };

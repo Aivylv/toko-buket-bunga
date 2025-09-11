@@ -56,10 +56,13 @@
   font-weight: 600;
   font-size: 0.9rem;
   color: #fff;
+  text-transform: capitalize;
 }
 
+/* === PERBAIKAN DAN PENAMBAHAN DI SINI === */
 .status-completed { background-color: #48bb78; }
-.status-shipped { background-color: #4299e1; }
+.status-shipped { background-color: #3182ce; }
+.status-processing { background-color: #4299e1; }
 .status-pending { background-color: #f6ad55; }
 .status-cancelled { background-color: #f56565; }
 
@@ -70,6 +73,7 @@
   background-color: transparent;
   border-radius: 20px;
   cursor: pointer;
+  text-decoration: none;
   transition: all 0.3s;
 }
 

@@ -133,20 +133,7 @@ const RegisterPage = () => {
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="role">Role</label>
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-            >
-              <option value="buyer">Buyer</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
+          
           
           <button 
             type="submit" 

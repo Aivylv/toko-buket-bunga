@@ -1,25 +1,36 @@
 const express = require('express');
 const db = require('../config/database');
-const { auth } = require('../middleware/auth'); // Import middleware auth
+const { auth } = require('../middleware/auth');
 const router = express.Router();
 
 // Get user's order history (Protected Route)
 router.get('/my-orders', auth, async (req, res) => {
   try {
     const [orders] = await db.promise().query(
-      'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC',
+      `SELECT o.*, u.nama_user, u.email 
+       FROM orders o 
+       JOIN users u ON o.user_id = u.id 
+       WHERE o.user_id = ? 
+       ORDER BY o.created_at DESC`,
       [req.user.id]
     );
-    res.json(orders);
+    
+    // Format total_pembayaran sebagai number
+    const formattedOrders = orders.map(order => ({
+      ...order,
+      total_pembayaran: parseFloat(order.total_pembayaran)
+    }));
+    
+    res.json(formattedOrders);
   } catch (error) {
     console.error('Get My Orders Error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-
+// Create new order
 router.post('/', auth, async (req, res) => {
-  const { shippingInfo, orderItems, total } = req.body;
+  const { shippingInfo, orderItems, subtotal, total } = req.body;
   const { namaPenerima, alamat, noHp } = shippingInfo;
   const user_id = req.user.id;
   
@@ -27,62 +38,69 @@ router.post('/', auth, async (req, res) => {
     return res.status(400).json({ message: 'Data pesanan tidak lengkap' });
   }
 
-  // Gunakan koneksi db secara langsung untuk transaksi
-  const dbPromise = db.promise();
-
+  const connection = await db.promise().getConnection();
+  
   try {
-    // Mulai transaksi
-    await dbPromise.beginTransaction();
+    await connection.beginTransaction();
 
-    // 1. Masukkan data ke tabel `orders`
-    const [orderResult] = await dbPromise.query(
-      'INSERT INTO orders (user_id, total_pembayaran, jumlah_produk, nama_penerima, alamat, no_hp, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    // 1. Insert into orders table
+    const [orderResult] = await connection.query(
+      `INSERT INTO orders (user_id, total_pembayaran, jumlah_produk, nama_penerima, alamat, no_hp, status) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [user_id, total, orderItems.length, namaPenerima, alamat, noHp, 'pending']
     );
 
     const orderId = orderResult.insertId;
 
-    // 2. Masukkan setiap item pesanan ke tabel `order_items`
+    // 2. Insert order items
     const orderItemsValues = orderItems.map(item => [
       orderId,
-      item.product_id,
+      item.product_id, // Menggunakan product_id dari item keranjang
       item.quantity,
       item.price
     ]);
 
-    await dbPromise.query(
+    await connection.query(
       'INSERT INTO order_items (order_id, product_id, jumlah, harga) VALUES ?',
       [orderItemsValues]
     );
 
-    // 3. Kosongkan keranjang pengguna
-    await dbPromise.query('DELETE FROM carts WHERE user_id = ?', [user_id]);
+    // 3. Clear user's cart
+    await connection.query('DELETE FROM carts WHERE user_id = ?', [user_id]);
 
-    // Jika semua berhasil, commit transaksi
-    await dbPromise.commit();
-    res.status(201).json({ message: 'Pesanan berhasil dibuat', orderId: orderId });
+    await connection.commit();
+    
+    res.status(201).json({ 
+      message: 'Pesanan berhasil dibuat', 
+      orderId: orderId 
+    });
 
   } catch (error) {
-    // Jika ada error, batalkan semua perubahan
-    await dbPromise.rollback();
+    await connection.rollback();
     console.error('Create Order Error:', error);
-    res.status(500).json({ message: 'Gagal membuat pesanan', error: error.message });
+    res.status(500).json({ 
+      message: 'Gagal membuat pesanan', 
+      error: error.message 
+    });
+  } finally {
+    connection.release();
   }
-  // Tidak perlu .release() karena kita tidak menggunakan pool
 });
 
-// --- Rute Admin (biarkan seperti sebelumnya) ---
-
-// Get all orders (untuk admin)
-router.get('/', async (req, res) => {
+// Get all orders (for admin)
+router.get('/', auth, async (req, res) => {
   try {
-    let query = `
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Akses ditolak. Hanya admin yang dapat mengakses.' });
+    }
+
+    const [orders] = await db.promise().query(`
       SELECT o.*, u.nama_user as customer_name, u.email as customer_email
       FROM orders o 
       JOIN users u ON o.user_id = u.id
       ORDER BY o.created_at DESC
-    `;
-    const [orders] = await db.promise().query(query);
+    `);
     
     const formattedOrders = orders.map(order => ({
       ...order,
@@ -97,7 +115,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get order by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   try {
     const [orders] = await db.promise().query(`
       SELECT o.*, u.nama_user, u.email
@@ -110,6 +128,11 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
     
+    // Check access rights (admin or order owner)
+    if (req.user.role !== 'admin' && orders[0].user_id !== req.user.id) {
+      return res.status(403).json({ message: 'Akses ditolak' });
+    }
+    
     const [orderItems] = await db.promise().query(`
       SELECT oi.*, p.nama_produk, p.gambar 
       FROM order_items oi 
@@ -119,6 +142,7 @@ router.get('/:id', async (req, res) => {
     
     const order = {
       ...orders[0],
+      total_pembayaran: parseFloat(orders[0].total_pembayaran),
       items: orderItems.map(item => ({
         ...item,
         harga: parseFloat(item.harga)
@@ -132,46 +156,74 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// === PERBAIKAN DI SINI ===
 // Update order status (admin only)
-router.put('/:id/status', async (req, res) => {
+router.put('/:id/status', auth, async (req, res) => {
   const { status } = req.body;
+  
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Akses ditolak. Hanya admin yang dapat mengupdate status.' });
+  }
   
   try {
     const validStatuses = ['pending', 'diproses', 'dikirim', 'selesai', 'dibatalkan'];
-    if (!validStatuses.includes(status)) {
+    const lowerCaseStatus = status.toLowerCase();
+
+    if (!validStatuses.includes(lowerCaseStatus)) {
       return res.status(400).json({ message: 'Status tidak valid' });
     }
 
     const [result] = await db.promise().query(
       'UPDATE orders SET status = ? WHERE id = ?',
-      [status, req.params.id]
+      [lowerCaseStatus, req.params.id]
     );
     
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({ message: 'Order tidak ditemukan' });
     }
     
     res.json({ message: 'Status order berhasil diupdate' });
   } catch (error) {
-    console.error('Update Order Status Error:', error);
+    console.error(`Error updating status for order ${req.params.id}:`, error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// Delete order
-router.delete('/:id', async (req, res) => {
+// Delete order (admin only)
+router.delete('/:id', auth, async (req, res) => {
+  // Check if user is admin
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Akses ditolak. Hanya admin yang dapat menghapus order.' });
+  }
+  
+  const connection = await db.promise().getConnection();
+  
   try {
-    await db.promise().query('DELETE FROM order_items WHERE order_id = ?', [req.params.id]);
-    const [result] = await db.promise().query('DELETE FROM orders WHERE id = ?', [req.params.id]);
+    await connection.beginTransaction();
     
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'Order not found' });
+    try {
+      // Delete order items first
+      await connection.query('DELETE FROM order_items WHERE order_id = ?', [req.params.id]);
+      
+      // Delete order
+      const [result] = await connection.query('DELETE FROM orders WHERE id = ?', [req.params.id]);
+      
+      if (result.affectedRows === 0) {
+        await connection.rollback();
+        return res.status(404).json({ message: 'Order not found' });
+      }
+      
+      await connection.commit();
+      res.json({ message: 'Order berhasil dihapus' });
+    } catch (error) {
+      await connection.rollback();
+      throw error;
     }
-    
-    res.json({ message: 'Order berhasil dihapus' });
   } catch (error) {
     console.error('Delete Order Error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
+  } finally {
+    connection.release();
   }
 });
 

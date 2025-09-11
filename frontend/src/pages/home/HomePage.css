@@ -17,6 +17,12 @@
   padding: 0 20px;
 }
 
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .hero-content h1 {
   font-size: 3rem;
   margin-bottom: 20px;
@@ -46,31 +52,6 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Promo Banner */
-.promo-banner {
-  background-color: #fbb6ce;
-  padding: 40px 0;
-  text-align: center;
-}
-
-.promo-banner h2 {
-  font-size: 2.2rem;
-  margin-bottom: 10px;
-  color: #702459;
-}
-
-.discount {
-  color: #d53f8c;
-  font-weight: 700;
-}
-
-.promo-banner p {
-  font-size: 1.1rem;
-  color: #4a5568;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
 /* Featured Products */
 .featured-products {
   padding: 80px 0;
@@ -89,6 +70,17 @@
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 30px;
   margin-bottom: 40px;
+}
+
+/* Penyesuaian untuk produk unggulan agar hanya 3 kolom */
+.products-grid.featured {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+@media (min-width: 992px) {
+  .products-grid.featured {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .view-all {
@@ -190,10 +182,6 @@
   
   .hero-content h1 {
     font-size: 2rem;
-  }
-  
-  .promo-banner h2 {
-    font-size: 1.8rem;
   }
   
   .featured-products h2 {

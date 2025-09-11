@@ -31,11 +31,19 @@ const OrderHistoryPage = () => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(price);
   };
 
+  // === PERBAIKAN DI SINI ===
   const getStatusDisplay = (status) => {
+    if (!status) return { text: 'Pending', className: 'status-pending' };
+    
     switch (status.toLowerCase()) {
-      case 'selesai': return { text: 'Selesai', className: 'status-completed' };
-      case 'dikirim': return { text: 'Dikirim', className: 'status-shipped' };
-      case 'dibatalkan': return { text: 'Dibatalkan', className: 'status-cancelled' };
+      case 'selesai': 
+        return { text: 'Selesai', className: 'status-completed' };
+      case 'diproses': 
+        return { text: 'Diproses', className: 'status-processing' };
+      case 'dikirim': 
+        return { text: 'Dikirim', className: 'status-shipped' };
+      case 'dibatalkan': 
+        return { text: 'Dibatalkan', className: 'status-cancelled' };
       case 'pending':
       default:
         return { text: 'Pending', className: 'status-pending' };
@@ -56,13 +64,12 @@ const OrderHistoryPage = () => {
             return (
               <div key={order.id} className="order-card">
                 <div className="order-details">
-                  <span className="order-id">#{order.id}</span>
+                  <span className="order-id">Pesanan #{order.id}</span>
                   <span className="order-date">Tanggal: {new Date(order.created_at).toLocaleDateString('id-ID')}</span>
                   <span className="order-total">{formatPrice(order.total_pembayaran)}</span>
                 </div>
                 <div className="order-actions">
                   <span className={`order-status ${statusInfo.className}`}>{statusInfo.text}</span>
-                  {/* 2. Ubah <button> menjadi <Link> */}
                   <Link to={`/order/${order.id}`} className="btn-details">
                     Lihat Detail
                   </Link>

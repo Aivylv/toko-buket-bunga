@@ -43,7 +43,8 @@ const ProductCard = ({ id, name, price, image, description }) => {
       </div>
       <div className="product-info">
         <h3 className="product-name">{name}</h3>
-        <p className="product-description">{description}</p>
+        {/* Baris deskripsi di bawah ini dihapus */}
+        {/* <p className="product-description">{description}</p> */}
         <div className="product-price">{formatPrice(price)}</div>
         <button className="add-to-cart-btn" onClick={handleAddToCart}>
           Tambah ke Keranjang

@@ -53,12 +53,23 @@ try {
   console.error('✗ Error loading cart routes:', error.message);
 }
 
+// === TAMBAHKAN INI ===
 try {
-  const reviewRoutes = require('./routes/reviews');
-  console.log('✓ Review routes loaded successfully');
-  app.use('/api/reviews', reviewRoutes);
+  const dashboardRoutes = require('./routes/dashboard');
+  console.log('✓ Dashboard routes loaded successfully');
+  app.use('/api/dashboard', dashboardRoutes);
 } catch (error) {
-  console.error('✗ Error loading review routes:', error.message);
+  console.error('✗ Error loading dashboard routes:', error.message);
+}
+// ======================
+
+try {
+  // Review routes tidak ada di file Anda, jadi saya hapus
+  // const reviewRoutes = require('./routes/reviews');
+  // console.log('✓ Review routes loaded successfully');
+  // app.use('/api/reviews', reviewRoutes);
+} catch (error) {
+  // console.error('✗ Error loading review routes:', error.message);
 }
 
 try {
@@ -78,6 +89,6 @@ app.use((error, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`\nServer running on port ${PORT}`);
-  console.log(`API endpoints available at http://localhost:${PORT}/api`);
+  console.log(`\n Server running on port ${PORT}`);
+  console.log(` API endpoints available at http://localhost:${PORT}/api`);
 });
