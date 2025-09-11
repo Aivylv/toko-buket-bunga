@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="https://liquipedia.net/commons/images/thumb/f/f1/Floryn_Dew.png/64px-Floryn_Dew.png" alt="Floryn Logo" width="150"/>
   <h1>Toko Buket Bunga (FLORYN)</h1>
   <p><strong>Aplikasi Web E-Commerce Full-Stack untuk Toko Buket Bunga Online</strong></p>
   <p>Proyek Final Praktikum Pengembangan Aplikasi Web</p>
