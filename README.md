@@ -86,3 +86,34 @@ npm install
 
 # 3. Jalankan aplikasi React
 npm start
+---
+
+## 👥 Kolaborator
+
+Terima kasih kepada para kontributor luar biasa yang telah membantu mewujudkan proyek ini:
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Aivylv">
+        <img src="https://avatars.githubusercontent.com/u/161410803?v=4" width="100px;" alt="Lyvia Ayuning Larasati"/>
+        <br />
+        <sub><b>Lyvia Ayuning Larasati (20230140182)</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/naxsyambis">
+        <img src="https://avatars.githubusercontent.com/u/155415896?v=4" width="100px;" alt="Friska Venunza Bayu"/>
+        <br />
+        <sub><b>Friska Venunza Bayu (20230140163)</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/dianfitrip">
+        <img src="https://avatars.githubusercontent.com/u/161410454?v=4" width="100px;" alt="Dian Fitri Pradini"/>
+        <br />
+        <sub><b>Dian Fitri Pradini (20230140177)</b></sub>
+      </a>
+    </td>
+    </tr>
+</table>
