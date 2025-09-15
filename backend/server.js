@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const multer = require('multer');
+const { logActivity } = require('./utils/logger'); // <-- DIPERBARUI: Impor logger baru
 
 // Load env vars
 dotenv.config();
@@ -80,9 +81,20 @@ try {
   console.error('✗ Error loading user routes:', error.message);
 }
 
-// Error handling middleware
+// Error handling middleware (MODIFIKASI DI SINI)
 app.use((error, req, res, next) => {
   console.error('Unhandled error:', error);
+  
+  // === LOGGING DIPERBARUI ===
+  // Mencatat error yang tidak tertangani sebagai FATAL dengan konteks lengkap
+  logActivity('FATAL', 'SERVER FATAL ERROR: Terjadi error yang tidak tertangani.', {
+    errorMessage: error.message,
+    errorStack: error.stack,
+    url: req.originalUrl,
+    method: req.method
+  });
+  // =========================
+  
   res.status(500).json({ message: 'Internal server error', error: error.message });
 });
 

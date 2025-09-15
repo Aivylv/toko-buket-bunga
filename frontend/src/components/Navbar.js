@@ -14,8 +14,8 @@ const Navbar = () => {
   
   const profileRef = useRef(null);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout(); // Tambahkan 'await' karena logout() di context sekarang async
     setIsProfileOpen(false);
     navigate('/');
   };

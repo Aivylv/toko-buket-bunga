@@ -50,7 +50,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    const token = localStorage.getItem('token');
+    
+    if (token && currentUser) {
+      try {
+        // 1. Kirim permintaan ke backend HANYA UNTUK MENCATAT log.
+        // Kita mengirim token agar backend tahu siapa yang logout.
+        await axios.post(`${API_BASE_URL}/logout`, {}, { // Body kosong
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch (error) {
+        // Jika API gagal (misal: token kadaluwarsa, server mati), 
+        // kita tetap logout pengguna di frontend. Jangan hentikan proses logout.
+        console.error('Logout API call failed, logging out locally anyway:', error.response?.data?.message || error.message);
+      }
+    }
+    
+    // 2. Selalu bersihkan sisi klien (frontend) apa pun yang terjadi pada API.
     setCurrentUser(null);
     localStorage.removeItem('token');
   };

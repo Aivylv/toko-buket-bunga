@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/database');
 const router = express.Router();
+const { logActivity } = require('../utils/logger');
+const { auth } = require('../middleware/auth');
 
 // Register
 router.post('/register', async (req, res) => {
@@ -26,6 +28,7 @@ router.post('/register', async (req, res) => {
     const [users] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
     
     if (users.length > 0) {
+      logActivity('WARN', 'REGISTRASI GAGAL: Email sudah terdaftar.', { email: email });
       return res.status(400).json({ message: 'User sudah terdaftar' });
     }
     
@@ -50,6 +53,8 @@ router.post('/register', async (req, res) => {
       { expiresIn: '7d' }
     );
     
+    logActivity('INFO', 'REGISTRASI: Pengguna baru berhasil dibuat.', { email: email, userId: result.insertId });
+    
     res.status(201).json({
       message: 'User berhasil dibuat',
       token,
@@ -61,6 +66,7 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (error) {
+    logActivity('ERROR', 'REGISTRASI ERROR: Terjadi kesalahan server.', { email: email, error: error.message });
     console.error('Register error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -80,6 +86,7 @@ router.post('/login', async (req, res) => {
     const [users] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
     
     if (users.length === 0) {
+      logActivity('WARN', 'LOGIN GAGAL: Email atau password salah (user tidak ditemukan).', { email: email });
       return res.status(400).json({ message: 'Email atau password salah' });
     }
     
@@ -89,6 +96,7 @@ router.post('/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     
     if (!isMatch) {
+      logActivity('WARN', 'LOGIN GAGAL: Email atau password salah (password tidak cocok).', { email: email });
       return res.status(400).json({ message: 'Email atau password salah' });
     }
     
@@ -103,6 +111,8 @@ router.post('/login', async (req, res) => {
       { expiresIn: '7d' }
     );
     
+    logActivity('INFO', 'LOGIN: Pengguna berhasil login.', { email: user.email, userId: user.id, role: user.role });
+    
     res.json({
       message: 'Login berhasil',
       token,
@@ -114,10 +124,39 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (error) {
+    logActivity('ERROR', 'LOGIN ERROR: Terjadi kesalahan server.', { email: email, error: error.message });
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
+// =============== TAMBAHAN RUTE LOGOUT ===============
+// Rute ini dilindungi oleh middleware 'auth'
+// Kita membutuhkannya agar kita tahu SIAPA yang logout untuk dicatat di log.
+router.post('/logout', auth, (req, res) => {
+  try {
+    // Middleware 'auth' telah memvalidasi token dan menaruh data user di 'req.user'
+    const { email, id, role } = req.user;
+    
+    // Catat aktivitas logout ke file log
+    logActivity('INFO', 'LOGOUT: Pengguna berhasil logout.', { email: email, userId: id, role: role });
+    
+    // Karena JWT bersifat stateless, server tidak perlu "menghancurkan" sesi.
+    // Klien (frontend) akan menghapus tokennya sendiri.
+    // Server hanya perlu merespons OK bahwa log telah diterima.
+    res.status(200).json({ message: 'Logout berhasil dicatat.' });
+    
+  } catch (error) {
+    // Menangani jika ada error saat proses logging itu sendiri
+    const userId = req.user ? req.user.id : 'unknown';
+    logActivity('ERROR', 'LOGOUT ERROR: Terjadi kesalahan saat memproses logout di server.', { 
+      error: error.message, 
+      userId: userId
+    });
+    res.status(500).json({ message: 'Server error saat logout' });
+  }
+});
+// ======================================================
 
 // Get current user profile
 router.get('/profile', async (req, res) => {
