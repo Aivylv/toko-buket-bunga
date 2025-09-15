@@ -72,15 +72,15 @@ Proyek ini telah memenuhi semua spesifikasi teknis dan fungsional yang diwajibka
 
 ### Prasyarat
 
-  - Node.js (v14 atau lebih baru)
-  - NPM (Node Package Manager)
-  - MySQL Server (misalnya melalui XAMPP)
+  - Node.js (v14 atau lebih baru).
+  - NPM (Node Package Manager).
+  - MySQL Server (misalnya melalui XAMPP atau Laragon).
 
 ### 1\. Setup Database
 
 1.  Buka phpMyAdmin atau *database client* Anda.
 2.  Buat database baru dengan nama `buket_bunga_db`.
-3.  Impor file skema SQL yang ada di proyek ke dalam database yang baru dibuat.
+3.  Import file skema SQL yang ada di proyek bagian folder upload->query ke dalam database yang baru dibuat.
 
 ### 2\. Instalasi dan Konfigurasi
 
