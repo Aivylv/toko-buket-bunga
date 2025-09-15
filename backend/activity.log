@@ -1,5 +1,0 @@
-[16/09/2025, 01.33.38] [INFO ] LOGOUT: Pengguna berhasil logout. | Konteks: (email: admin@mail.com, userId: 3, role: admin)
-[16/09/2025, 01.33.48] [INFO ] LOGIN: Pengguna berhasil login. | Konteks: (email: lyvia@mail.com, userId: 1, role: buyer)
-[16/09/2025, 01.33.54] [INFO ] LOGOUT: Pengguna berhasil logout. | Konteks: (email: lyvia@mail.com, userId: 1, role: buyer)
-[16/09/2025, 01.33.58] [INFO ] LOGIN: Pengguna berhasil login. | Konteks: (email: admin@mail.com, userId: 3, role: admin)
-[16/09/2025, 01.34.22] [INFO ] LOGOUT: Pengguna berhasil logout. | Konteks: (email: admin@mail.com, userId: 3, role: admin)
