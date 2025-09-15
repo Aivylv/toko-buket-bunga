@@ -82,8 +82,17 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-    const removeFromCart = async (cartId) => {
-    // ... (fungsi ini biarkan seperti sebelumnya)
+  const removeFromCart = async (cartId) => {
+    try {
+      // 1. Panggil API endpoint DELETE
+      await axios.delete(`${API_URL}/${cartId}`, getAuthHeaders());
+      
+      // 2. Muat ulang (refresh) data keranjang setelah berhasil menghapus
+      fetchCartItems(); 
+    } catch (error) {
+      console.error("Gagal menghapus item dari keranjang:", error);
+      alert('Gagal menghapus item.');
+    }
   };
 
   const value = {
