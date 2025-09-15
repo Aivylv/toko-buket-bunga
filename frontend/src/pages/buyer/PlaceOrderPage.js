@@ -41,7 +41,8 @@ const PlaceOrderPage = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/orders', orderData, {
+      // MODIFIKASI: Ganti localhost dengan IP lokal Anda
+      await axios.post('http://192.168.0.108:5000/api/orders', orderData, {
         headers: {
           Authorization: `Bearer ${token}`
         }

@@ -4,8 +4,9 @@ import axios from 'axios';
 import ProductCard from '../../components/ProductCard';
 import './HomePage.css';
 
-const API_URL = 'http://localhost:5000/api/products';
-const BASE_URL = 'http://localhost:5000/';
+// MODIFIKASI: Ganti localhost dengan IP lokal Anda
+const API_URL = 'http://192.168.0.108:5000/api/products';
+const BASE_URL = 'http://192.168.0.108:5000/';
 
 const HomePage = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);

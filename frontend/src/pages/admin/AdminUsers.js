@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Admin.css';
 
-const API_URL = 'http://localhost:5000/api/users';
+// MODIFIKASI: Ganti localhost dengan IP lokal Anda
+const API_URL = 'http://192.168.0.108:5000/api/users';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);

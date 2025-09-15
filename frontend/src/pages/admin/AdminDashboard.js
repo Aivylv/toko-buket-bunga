@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './Admin.css';
 
+// MODIFIKASI: Ganti localhost dengan IP lokal Anda
+const API_URL = 'http://192.168.0.108:5000/api/dashboard/stats';
+
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
     totalProduk: 0,
@@ -27,7 +30,7 @@ const AdminDashboard = () => {
       try {
         setLoading(true);
         setError(''); // Reset error
-        const { data } = await axios.get('http://localhost:5000/api/dashboard/stats', getAuthHeaders());
+        const { data } = await axios.get(API_URL, getAuthHeaders());
         setStats({
           totalProduk: data.totalProduk,
           totalPesanan: data.totalPesanan,

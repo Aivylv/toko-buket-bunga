@@ -11,7 +11,8 @@ const OrderHistoryPage = () => {
     const fetchOrderHistory = async () => {
       try {
         const token = localStorage.getItem('token');
-        const { data } = await axios.get('http://localhost:5000/api/orders/my-orders', {
+        // MODIFIKASI: Ganti localhost dengan IP lokal Anda
+        const { data } = await axios.get('http://192.168.0.108:5000/api/orders/my-orders', {
           headers: {
             Authorization: `Bearer ${token}`
           }

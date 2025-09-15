@@ -88,7 +88,8 @@ app.use((error, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+// MODIFIKASI: Tambahkan '0.0.0.0' agar bisa diakses dari jaringan lokal
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n Server running on port ${PORT}`);
-  console.log(` API endpoints available at http://localhost:${PORT}/api`);
+  console.log(` API endpoints available at http://192.168.0.108:${PORT}/api`);
 });

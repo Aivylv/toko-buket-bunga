@@ -3,8 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import './OrderDetailPage.css'; // Kita akan buat file CSS ini nanti
 
-const API_URL = 'http://localhost:5000/api/orders';
-const BASE_URL = 'http://localhost:5000/';
+// MODIFIKASI: Ganti localhost dengan IP lokal Anda
+const API_URL = 'http://192.168.0.108:5000/api/orders';
+const BASE_URL = 'http://192.168.0.108:5000/';
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();

@@ -5,8 +5,9 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import './ProductDetailPage.css'; // Kita akan buat file CSS ini
 
-const API_URL = 'http://localhost:5000/api/products';
-const BASE_URL = 'http://localhost:5000/';
+// MODIFIKASI: Ganti localhost dengan IP lokal Anda
+const API_URL = 'http://192.168.0.108:5000/api/products';
+const BASE_URL = 'http://192.168.0.108:5000/';
 
 const ProductDetailPage = () => {
   const { id } = useParams();

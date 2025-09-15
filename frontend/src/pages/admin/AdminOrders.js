@@ -5,7 +5,8 @@ import { formatRupiah, formatDate } from '@biyy/format-rupiah-datetime';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const API_URL = 'http://localhost:5000/api/orders';
+// MODIFIKASI: Ganti localhost dengan IP lokal Anda
+const API_URL = 'http://192.168.0.108:5000/api/orders';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);

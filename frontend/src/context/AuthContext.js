@@ -7,6 +7,9 @@ export const useAuth = () => {
   return useContext(AuthContext);
 };
 
+// MODIFIKASI: Ganti localhost dengan IP lokal Anda
+const API_BASE_URL = 'http://192.168.0.108:5000/api/auth';
+
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      axios.get('http://localhost:5000/api/auth/profile', {
+      axios.get(`${API_BASE_URL}/profile`, {
         headers: { 'Authorization': `Bearer ${token}` }
       }).then(res => {
         setCurrentUser(res.data.user);
@@ -27,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', userData);
+      const response = await axios.post(`${API_BASE_URL}/register`, userData);
       localStorage.setItem('token', response.data.token);
       setCurrentUser(response.data.user);
       return { success: true, user: response.data.user };
@@ -38,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const response = await axios.post(`${API_BASE_URL}/login`, { email, password });
       localStorage.setItem('token', response.data.token);
       setCurrentUser(response.data.user);
       return { success: true, user: response.data.user };

@@ -8,8 +8,9 @@ export const useCart = () => {
   return useContext(CartContext);
 };
 
-const API_URL = 'http://localhost:5000/api/cart';
-const BASE_URL = 'http://localhost:5000/';
+// MODIFIKASI: Ganti localhost dengan IP lokal Anda
+const API_URL = 'http://192.168.0.108:5000/api/cart';
+const BASE_URL = 'http://192.168.0.108:5000/';
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
